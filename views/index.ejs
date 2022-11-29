@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--link rel='stylesheet' href='/stylesheets/style.css' /-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css" integrity="sha512-KXol4x3sVoO+8ZsWPFI/r5KBVB/ssCGB5tsv2nVOKwLg33wTFP3fmnXa47FdSVIshVTgsYk/1734xSk9aFIa4A==" crossorigin="anonymous" referrerpolicy="no-referrer" />  
+    </head>
+  <body>
+<div class="ui ten stackable cards">
+  
+
+<% var o = data %>
+<% for(var s in o ){ %> 
+
+      
+      
+                            <div class="card">
+                        <div class="image">
+                          <img src="<%= o[s].imgUrl%>" width="100px">
+                        </div>
+                        <div class="content">
+                          <a href="/artist/<%=s%>" target="_blank"><%= o[s].names.KO %><br><%= o[s].names.EN %></a>
+                        </div>
+                      </div>
+      
+
+<% } %>    
+ </div>         
+
+  </body>
+</html>
+
+    <script>
+       
+        
+// https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=UCRDd3x33kfF0IW6g2MRUkRw&key=AIzaSyAbw5RHbmB2LGOikgoWrIEhpyBTlDz7Qec
+// https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=UCLkAepWjdylmXSltofFvsYQ&maxResults=50&key=AIzaSyAbw5RHbmB2LGOikgoWrIEhpyBTlDz7Qec
+
+        
+        var getYoutubeChannelId = function( channelId,target_dom, callback ){
+            var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() { // 요청에 대한 콜백
+                    if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
+                    if (xhr.status === 200 || xhr.status === 201) {
+                            console.log(xhr.responseText);
+                            var dataO = JSON.parse(xhr.responseText);
+                        	callback( dataO.items[ 0 ].contentDetails.relatedPlaylists.uploads )
+                        
+                        } else {
+                        	console.error(xhr.responseText);
+                        }
+                    }
+                };
+                xhr.open('GET', 'https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=' + channelId + '&key=AIzaSyAbw5RHbmB2LGOikgoWrIEhpyBTlDz7Qec' ); // 메소드와 주소 설정
+                xhr.send()
+        }
+        var getYoutubePlayList = function( uploadsId,target_dom, callback ){
+                        var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() { // 요청에 대한 콜백
+                    if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
+                    if (xhr.status === 200 || xhr.status === 201) {
+                            console.log(xhr.responseText);
+                            var dataO = JSON.parse(xhr.responseText);
+                        	callback(dataO.items)
+                        
+                        } else {
+                        	console.error(xhr.responseText);
+                        }
+                    }
+                };
+                xhr.open('GET', 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=' + uploadsId + '&maxResults=5&key=AIzaSyAbw5RHbmB2LGOikgoWrIEhpyBTlDz7Qec' ); // 메소드와 주소 설정
+                xhr.send()
+        }
+        
+        /*
+        {
+            "title":"&apos;평균키 183cm&apos; 김종국→지현우, 덴<b>마크<\/b>서 &apos;<b>아이돌<\/b>&apos;로 오해받은 사연 (&apos;도포자...",
+            "originallink":"https:\/\/tenasia.hankyung.com\/tv\/article\/2022062285614",
+            "link":"https:\/\/n.news.naver.com\/mnews\/article\/312\/0000554286?sid=106",
+            "description":"평균신장 183cm의 멤버들이 5색 도포를 입고 덴<b>마크<\/b>의 랜드<b>마크<\/b>인 뉘하운 거리를 거닐자, 이를 본 덴<b>마크<\/b> 현지인들은 멤버들을 <b>K<\/b>-<b>POP<\/b> <b>아이돌<\/b>로 착각하는 웃지 못할 헤프닝이 벌어졌다고. 멤버들은 과분한 착각에... ",
+            "pubDate":"Wed, 22 Jun 2022 14:40:00 +0900"
+        },
+        */
+        var renderNews = function( arr,taragetDom ){
+            
+            var html = ""
+            if( !arr || arr.length == 0 ) html += "<div>Data Not Found!</div>"
+            else
+            {
+                var i = 0,iLen = arr.length,io;
+                for(;i<iLen;++i){
+                    io = arr[ i ];
+                    html += `<h4>${io.title}</h4><div>${io.link}</div><div>${io.description}</div><div>${io.pubDate}</div><div class="ui divider"></div>` 
+                }
+            }
+            
+            taragetDom.innerHTML = html;
+            return;
+        }
+        
+    	var renderAlbum = function( arr,taragetDom ){
+            
+            var html = ""
+            if( !arr || arr.length == 0 ) html += "<div>Data Not Found!</div>"
+            else
+            {
+                var i = 0,iLen = arr.length,io;
+                for(;i<iLen;++i){
+                    io = arr[ i ];
+                    html += `
+                    <div class="ui feed">
+                      <div class="event">
+                        <div class="label">
+                          <img src="${io.images[2].url}">
+                        </div>
+                        <div class="content">
+                          <a href="${io.external_urls.spotify}" target="_blank">${io.name}</a>
+                        </div>
+                      </div>
+                    </div>
+					` 
+                }
+            }
+            
+            taragetDom.innerHTML = html;
+            return;
+        }
+        window.media = {}
+        var renderRecentTwitter = function( arr,taragetDom ){
+            
+            var html = ""
+            if( !arr || arr.length == 0 ) html += "<div>Data Not Found!</div>"
+            else
+            {
+                if( arr.includes && arr.includes.media )
+                {
+                	var z = 0,zLen = arr.includes.media.length,zo;
+                    for(;z<zLen;++z){
+                        zo = arr.includes.media[ z ];
+                        window.media[ zo.media_key ] = zo.url || zo.preview_image_url
+
+                    }    
+                }
+                
+                
+                var i = 0,iLen = arr.data.length,io;
+                for(;i<iLen;++i){
+                    io = arr.data[ i ];
+                    
+                    var imgTag = "";
+                    if( io.attachments ) if( io.attachments.media_keys && io.attachments.media_keys.length > 0 )
+                    {
+                    	var k = 0,kLen = io.attachments.media_keys.length,ko
+                        for(;k<kLen;++k){
+                            imgTag +=  `<img src="${ window.media[ io.attachments.media_keys[ k ] ]}" width="100px">`
+                        }
+                    }
+                    
+                    html += `
+                    
+                    
+                    <div class="ui large feed">
+                      <div class="event">
+                        <div class="content">
+                          <a href="#" target="_blank" style="font-size:11px;">${io.text}<br>${io.created_at}</a>
+                        	<div class="extra images">
+							${imgTag}
+                     	   </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="ui divider"></div>
+					` 
+                }
+            }
+            
+            taragetDom.innerHTML = html;
+            return;
+        }
+        var getSnsInfoFuncs = {
+            youtube : function( target_dom,sns_id ){
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() { // 요청에 대한 콜백
+                    if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
+                    if (xhr.status === 200 || xhr.status === 201) {
+                            console.log(xhr.responseText);
+                            var dataO = JSON.parse(xhr.responseText);
+                        	var txt =  "<div> 구독자수 : " + dataO.items[ 0 ].statistics.subscriberCount  + " / 전체재생수 : " + dataO.items[ 0 ].statistics.viewCount + "</div>"
+                        	//target_dom.innerHTML = xhr.responseText;
+                        	getYoutubeChannelId( dataO.items[ 0 ].id,target_dom,function(d){
+                                getYoutubePlayList( d,target_dom, function(playList){
+                                    var html = ""
+									playList.forEach(function(item){
+                                        html += `
+                                            <div class="ui feed">
+                                              <div class="event">
+                                                <div class="label">
+                                                  <img src="${item.snippet.thumbnails.default.url}">
+                                                </div>
+                                                <div class="content">
+                                                  <a href="https://www.youtube.com/watch?v=${item.snippet.resourceId.videoId}" target="_blank">${item.snippet.title}</a>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            ` 
+                                    })                                    
+                                    target_dom.innerHTML = html;
+                                })
+                            })
+                        } else {
+                        	console.error(xhr.responseText);
+                        }
+                    }
+                };
+                xhr.open('GET', '/getData/youtube?artist_id=' + sns_id ); // 메소드와 주소 설정
+                xhr.send()
+            },
+            twitter : function( target_dom,sns_id ){
+                var xhr = new XMLHttpRequest();
+                
+                xhr.onreadystatechange = function() { // 요청에 대한 콜백
+                    if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
+                    if (xhr.status === 200 || xhr.status === 201) {
+                            console.log(xhr.responseText);
+                            var o = JSON.parse( xhr.responseText );
+                        	renderRecentTwitter(o,target_dom)
+                            //target_dom.innerText = xhr.responseText;
+                        } else {
+                        	console.error(xhr.responseText);
+                        }
+                    }
+                };
+                
+                xhr.open('GET', '/getData/twitter?artist_id=' + sns_id ); // 메소드와 주소 설정
+                xhr.send()
+            },
+            spotify : function( target_dom,sns_id ){
+                var xhr = new XMLHttpRequest();
+                
+                xhr.onreadystatechange = function() { // 요청에 대한 콜백
+                    if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
+                    if (xhr.status === 200 || xhr.status === 201) {
+                            console.log(xhr.responseText);
+                            //target_dom.innerText = xhr.responseText;
+                        var o = JSON.parse( xhr.responseText );
+                            renderAlbum(o.items,target_dom)
+                        } else {
+                        	console.error(xhr.responseText);
+                        }
+                    }
+                };
+                
+                xhr.open('GET', '/getData/spotifyByAlbum?artist_id=' + sns_id ); // 메소드와 주소 설정
+                xhr.send()
+            },
+            instagram : function( target_dom,sns_id ){
+                var xhr = new XMLHttpRequest();
+                
+                xhr.onreadystatechange = function() { // 요청에 대한 콜백
+                    if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
+                    if (xhr.status === 200 || xhr.status === 201) {
+                            console.log(xhr.responseText);
+                            target_dom.innerText = xhr.responseText;
+                        	
+                    	} else {
+                        	console.error(xhr.responseText);
+                        }
+                    }
+                };
+                
+                xhr.open('GET', '/getData/instagram?artist_id=' + sns_id ); // 메소드와 주소 설정
+                xhr.send()
+            },
+            news : function( target_dom,sns_id ){
+                var xhr = new XMLHttpRequest();
+                
+                xhr.onreadystatechange = function() { // 요청에 대한 콜백
+                    if (xhr.readyState === xhr.DONE) { // 요청이 완료되면
+                    if (xhr.status === 200 || xhr.status === 201) {
+                            console.log(xhr.responseText);
+                        	var o = JSON.parse( xhr.responseText );
+                        	renderNews(o.items,target_dom)
+                            //target_dom.innerText = xhr.responseText;
+                        } else {
+                        	console.error(xhr.responseText);
+                        }
+                    }
+                };
+                
+                xhr.open('GET', '/getData/news?artist_id=kpop 아이돌 ' + sns_id); // 메소드와 주소 설정
+                xhr.send()
+            },
+        }
+        
+        var btns = window.document.getElementsByClassName( "btn_test" );
+        
+        var i = 0,iLen = btns.length,io;
+        for(;i<iLen;++i){
+            io = btns[ i ];
+            io.addEventListener("click",function(e){
+                var target_dom_id = e.target.getAttribute( "data-artist" );
+                var sns_type = e.target.getAttribute( "data-sns" );
+                var target_dom = window.document.getElementById( target_dom_id )
+                
+                if( sns_type == "news" )
+                {
+                    var sns_id = e.target.getAttribute( "data-url" );
+                }
+                // else if( sns_type == "spotify" )
+                // {
+                //     var sns_id = e.target.getAttribute( "data-artist" );
+                // }
+                else
+            	{
+                	var _t_sns_id = e.target.getAttribute( "data-url" );
+                    if( _t_sns_id[ _t_sns_id.length - 1 ] == "/" )
+                    {
+                        var sns_id = _t_sns_id.substr(0,_t_sns_id.length - 1).split( "/" ).pop(); 
+                    }
+                    else
+                    {
+                        var sns_id = _t_sns_id.split( "/" ).pop();
+                    }    
+                }
+                
+                
+                if( !getSnsInfoFuncs[ sns_type ] ) return;
+                getSnsInfoFuncs[ sns_type ]( target_dom, sns_id );
+            })
+        }
+    </script>
