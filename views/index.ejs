@@ -3,33 +3,52 @@
   <head>
     <!--link rel='stylesheet' href='/stylesheets/style.css' /-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.5.0/semantic.min.css" integrity="sha512-KXol4x3sVoO+8ZsWPFI/r5KBVB/ssCGB5tsv2nVOKwLg33wTFP3fmnXa47FdSVIshVTgsYk/1734xSk9aFIa4A==" crossorigin="anonymous" referrerpolicy="no-referrer" />  
-    </head>
+    <style>
+        #columns{
+          column-width:200px;
+          column-gap: 15px;
+        }
+        #columns figure{
+          display: inline-block;
+          border:1px solid rgba(0,0,0,0.2);
+          margin:0;
+          margin-bottom: 15px;
+          padding:10px;
+          /* box-shadow: 2px 2px 5px rgba(0,0,0,0.5);; */
+        }
+        #columns figure img{
+          width:100%;
+        }
+        #columns figure figcaption{
+          border-top:1px solid rgba(0,0,0,0.2);
+          padding:10px;
+          margin-top:11px;
+        }
+      </style>
+</head>
   <body>
-<div class="ui ten stackable cards">
-  
-
-<% var o = data %>
-<% for(var s in o ){ %> 
-
-      
-      
-                            <div class="card">
-                        <div class="image">
-                          <img src="<%= o[s].imgUrl%>" width="100px">
-                        </div>
-                        <div class="content">
-                          <a href="/artist/<%=s%>" target="_blank"><%= o[s].names.KO %><br><%= o[s].names.EN %></a>
-                        </div>
-                      </div>
-      
-
-<% } %>    
- </div>         
-
+    <div id="columns">
+    <% var o = data %>
+    <% for(var s in o ){ %> 
+        <figure>
+              <img src="<%= o[s].imgUrl%>" width="100px">
+                <a href="/artist/<%=s%>" target="_blank"></a>
+                <div class="header"><%= o[s].names.KO %></div>
+                <%= o[s].names.EN %>
+                <div class="description">
+                    <% for(var z in o[s].sns ){ %> 
+                    <!--button class="tiny ui button btn_test" data-sns="<%=z%>"-->
+                        <%= z  %>
+                    <!--/button-->
+                    <% } %>  
+                </div>
+                </a>
+        </figure>
+    <% } %>     
+    </div>    
   </body>
 </html>
-
-    <script>
+<script>
        
         
 // https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=UCRDd3x33kfF0IW6g2MRUkRw&key=AIzaSyAbw5RHbmB2LGOikgoWrIEhpyBTlDz7Qec
@@ -327,4 +346,4 @@
                 getSnsInfoFuncs[ sns_type ]( target_dom, sns_id );
             })
         }
-    </script>
+</script>
